@@ -232,10 +232,15 @@ class JiraAgileImporter(JiraImporterCommon):
                     estimation = None
                     if issue['fields'].get(estimation_field, None):
                         estimation = float(issue['fields'].get(estimation_field))
-
+                    if (estimation is None):
+                        time = estimation
+                    elif estimation < 3600:
+                        time = round(estimation/3600,2)
+                    else:
+                        time = estimation/3600
                     (points, _) = Points.objects.get_or_create(
                         project=project,
-                        value=estimation,
+                        value=time,
                         defaults={
                             "name": str(estimation),
                             "order": estimation,

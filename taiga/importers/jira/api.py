@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
-
+import logging
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
