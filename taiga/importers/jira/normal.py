@@ -224,9 +224,15 @@ class JiraNormalImporter(JiraImporterCommon):
 
                     points_value = issue['fields'].get(self.greenhopper_fields.get('points', None), None)
                     if points_value:
+                        if (points_value is None):
+                            time = points_value
+                        elif points_value < 3600:
+                            time = round(points_value/3600,2)
+                        else:
+                            time = points_value/3600
                         (points, _) = Points.objects.get_or_create(
                             project=project,
-                            value=points_value,
+                            value=time,
                             defaults={
                                 "name": str(points_value),
                                 "order": points_value,

@@ -644,9 +644,15 @@ class JiraImporterCommon:
                 old_points = None
                 if history_item['fromString']:
                     estimation = float(history_item['fromString'])
+                    if (estimation is None):
+                        time = estimation
+                    elif estimation < 3600:
+                        time = round(estimation/3600,2)
+                    else:
+                        time = estimation/3600
                     (old_points, _) = Points.objects.get_or_create(
                         project=project,
-                        value=estimation,
+                        value=time,
                         defaults={
                             "name": str(estimation),
                             "order": estimation,
