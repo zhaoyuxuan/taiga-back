@@ -190,23 +190,34 @@ class JiraImporterCommon:
     def list_users(self):
         result = []
         projects = self._client.get('/project')
+
         users = self._client.get("/user/assignable/multiProjectSearch", {
             "username": "",
             "projectKeys": list(map(lambda x: x['key'], projects)),
             "maxResults": 1000,
         })
+
+        for project in projects:
+            user = self._client.get("/user/assignable/search", {
+                "project": project["key"],
+                })
+            for each in user:
+                if (each not in users):
+                    users.append(each)
+
         for user in users:
             user_data = self._client.get("/user", {
                 "key": user['key']
             })
+
             result.append({
                 "id": user_data['key'],
                 "full_name": user_data['displayName'],
                 "email": user_data['emailAddress'],
                 "avatar": user_data.get('avatarUrls', None) and user_data['avatarUrls'].get('48x48', None),
             })
-        return result
 
+        return result
     def _import_comments(self, obj, issue, options):
         users_bindings = options.get('users_bindings', {})
         offset = 0
@@ -451,6 +462,7 @@ class JiraImporterCommon:
 
 
     def _import_changelog(self, project, obj, issue, options):
+
         obj.cummulative_attachments = []
         for history in sorted(issue['changelog']['histories'], key=lambda h: h['created']):
             self._import_history(project, obj, history, options)
