@@ -48,6 +48,8 @@ from taiga.projects.history.choices import HistoryType
 from taiga.mdrender.service import render as mdrender
 from taiga.importers import exceptions
 from taiga.front.templatetags.functions import resolve as resolve_front_url
+import logging
+logger = logging.getLogger("jira importer")
 
 EPIC_COLORS = {
     "ghx-label-0": "#ffffff",
@@ -95,7 +97,11 @@ def links_to_richtext(importer, issue, links):
 
     return richtext
 
-
+def convertToRemainingTime(issue):
+    if "originalEstimateSeconds" in issue["fields"]["timetracking"]:
+        return str(round(float(issue["fields"]["timetracking"]["originalEstimateSeconds"])/3600,2))+"h"
+    else:
+        return "?"
 class JiraClient:
     def __init__(self, server, oauth):
         self.server = server
@@ -250,6 +256,13 @@ class JiraImporterCommon:
                 project=project
             )
             model.objects.create(
+                name="Remaining Time",
+                description="Remaining Time",
+                type="text",
+                order=1,
+                project=project
+            )
+            model.objects.create(
                 name="Priority",
                 description="Priority",
                 type="text",
@@ -356,6 +369,12 @@ class JiraImporterCommon:
             "taiga_field_name": "Links",
             "transform": lambda issue, obj: links_to_richtext(self, issue, obj)
         })
+        custom_fields.append({
+            "history_name": "Remaining Time",
+            "jira_field_name": "timetracking",
+            "taiga_field_name": "Remaining Time",
+            "transform": lambda issue,obj: convertToRemainingTime(issue)
+        })
 
         greenhopper_fields = {}
         for custom_field in self._client.get("/field"):
@@ -429,6 +448,7 @@ class JiraImporterCommon:
         custom_attributes_values = {}
         for custom_field in self.custom_fields:
             data = issue['fields'].get(custom_field['jira_field_name'], None)
+
             if data and "transform" in custom_field:
                 data = custom_field['transform'](issue, data)
 

@@ -18,6 +18,8 @@
 
 import datetime
 from collections import OrderedDict
+import logging
+logger = logging.getLogger("jira importer")
 
 from django.template.defaultfilters import slugify
 from taiga.projects.references.models import recalc_reference_counter
@@ -187,6 +189,7 @@ class JiraAgileImporter(JiraImporterCommon):
                 "startAt": offset,
                 "expand": "changelog",
             })
+
             offset += issues['maxResults']
 
             for issue in issues['issues']:
@@ -280,6 +283,7 @@ class JiraAgileImporter(JiraImporterCommon):
                 "startAt": offset,
                 "expand": "changelog",
             })
+
             offset += issues['maxResults']
 
             for issue in issues['issues']:
