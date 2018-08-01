@@ -674,7 +674,7 @@ class JiraImporterCommon:
                         project=project,
                         value=time,
                         defaults={
-                            "name": str(estimation),
+                            "name": str(time),
                             "order": estimation,
                         }
                     )
