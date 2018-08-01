@@ -62,6 +62,9 @@ class JiraAgileImporter(JiraImporterCommon):
     def _import_project_data(self, project_id, options):
         project = self._client.get_agile("/board/{}".format(project_id))
         project_config = self._client.get_agile("/board/{}/configuration".format(project_id))
+        logger.error(project_id)
+        logger.error("**************************")
+        logger.error(project_config)
         if project['type'] == "scrum":
             project_template = ProjectTemplate.objects.get(slug="scrum")
             options['type'] = "scrum"
@@ -76,7 +79,10 @@ class JiraAgileImporter(JiraImporterCommon):
         project_template.issue_statuses = OrderedDict()
 
         counter = 0
+
         for column in project_config['columnConfig']['columns']:
+            logger.error(column)
+            logger.error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             column_slug = slugify(column['name'])
             project_template.epic_statuses[column_slug] = {
                 "name": column['name'],
@@ -205,12 +211,21 @@ class JiraAgileImporter(JiraImporterCommon):
                     milestone = project.milestones.get(name=(issue['fields'].get('sprint', {}) or {}).get('name', ''))
                 except Milestone.DoesNotExist:
                     milestone = None
+                logger.error(issue)
+                logger.error("00000000000000000000000000000")
+                logger.error(issue['fields']['status']['name'])
+                logger.error("++++++++++++++++++++++++")
+                logger.error(project.us_statuses.all())
+                # try:
+                #     project.us_statuses.get(slug=slugify(issue['fields']['status']['name']))
+                # except:
+
 
                 us = UserStory.objects.create(
                     project=project,
                     owner=owner,
                     assigned_to=assigned_to,
-                    status=project.us_statuses.get(slug=slugify(issue['fields']['status']['name'])),
+                    status=project.us_statuses.get(slug=slugify(issue['fields']['status']['statusCategory']['name'])),
                     kanban_order=counter,
                     sprint_order=counter,
                     backlog_order=counter,
@@ -300,7 +315,7 @@ class JiraAgileImporter(JiraImporterCommon):
                     project=project,
                     owner=owner,
                     assigned_to=assigned_to,
-                    status=project.task_statuses.get(slug=slugify(issue['fields']['status']['name'])),
+                    status=project.task_statuses.get(slug=slugify(issue['fields']['status']['statusCategory']['name'])),
                     subject=issue['fields']['summary'],
                     description=issue['fields']['description'] or '',
                     tags=issue['fields']['labels'],
