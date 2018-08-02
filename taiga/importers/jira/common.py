@@ -102,6 +102,18 @@ def convertToRemainingTime(issue):
         return str(round(float(issue["fields"]["timetracking"]["originalEstimateSeconds"])/3600,2))+"h"
     else:
         return "?"
+
+def worklogTransform(issue):
+    display_message = ""
+    for each in issue["fields"]["worklog"]["worklogs"]:
+        work_description = each["comment"]
+        time = each["updated"]
+        person = each['updateAuthor']['displayName']
+        time_spent = each['timeSpent']
+        message = person + " logged work on "+time+" with description: "+work_description+"  Time Spent"+time_spent+"\n"
+        display_message += message
+    return display_message
+
 class JiraClient:
     def __init__(self, server, oauth):
         self.server = server
@@ -245,6 +257,7 @@ class JiraImporterCommon:
             if len(comments['comments']) <= comments['maxResults']:
                 break
 
+
     def _create_custom_fields(self, project):
         custom_fields = []
         for model in [UserStoryCustomAttribute, TaskCustomAttribute, IssueCustomAttribute, EpicCustomAttribute]:
@@ -259,6 +272,13 @@ class JiraImporterCommon:
                 name="Remaining Time",
                 description="Remaining Time",
                 type="text",
+                order=1,
+                project=project
+            )
+            model.objects.create(
+                name="log work",
+                description="log work",
+                type="multiline",
                 order=1,
                 project=project
             )
@@ -322,6 +342,12 @@ class JiraImporterCommon:
             "history_name": "duedate",
             "jira_field_name": "duedate",
             "taiga_field_name": "Due date",
+        })
+        custom_fields.append({
+            "history_name": "worklog",
+            "jira_field_name": "worklog",
+            "taiga_field_name": "log work",
+            "transform" : lambda issue,obj:worklogTransform(issue)
         })
         custom_fields.append({
             "history_name": "priority",

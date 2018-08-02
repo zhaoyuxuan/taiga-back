@@ -197,7 +197,6 @@ class JiraAgileImporter(JiraImporterCommon):
                 issue['fields']['issuelinks'] += self._client.get("/issue/{}/remotelink".format(issue['key']))
                 assigned_to = users_bindings.get(issue['fields']['assignee']['key'] if issue['fields']['assignee'] else None, None)
                 owner = users_bindings.get(issue['fields']['creator']['key'] if issue['fields']['creator'] else None, self._user)
-
                 external_reference = None
                 if options.get('keep_external_reference', False):
                     external_reference = ["jira", self._client.get_issue_url(issue['key'])]
@@ -206,7 +205,7 @@ class JiraAgileImporter(JiraImporterCommon):
                     milestone = project.milestones.get(name=(issue['fields'].get('sprint', {}) or {}).get('name', ''))
                 except Milestone.DoesNotExist:
                     milestone = None
-                    
+
                 us = UserStory.objects.create(
                     project=project,
                     owner=owner,
