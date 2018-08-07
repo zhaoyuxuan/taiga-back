@@ -76,9 +76,9 @@ class JiraAgileImporter(JiraImporterCommon):
         project_template.issue_statuses = OrderedDict()
 
         counter = 0
-
         for column in project_config['columnConfig']['columns']:
             column_slug = slugify(column['name'])
+
             project_template.epic_statuses[column_slug] = {
                 "name": column['name'],
                 "slug": column_slug,
@@ -116,6 +116,7 @@ class JiraAgileImporter(JiraImporterCommon):
                 "order": counter,
             }
             counter += 1
+
 
         project_template.epic_statuses = list(project_template.epic_statuses.values())
         project_template.us_statuses = list(project_template.us_statuses.values())
@@ -185,6 +186,7 @@ class JiraAgileImporter(JiraImporterCommon):
 
         counter = 0
         offset = 0
+        columns = project_conf['columnConfig']['columns']
         while True:
             issues = self._client.get_agile("/board/{}/issue".format(project_id), {
                 "startAt": offset,
@@ -193,24 +195,30 @@ class JiraAgileImporter(JiraImporterCommon):
 
             offset += issues['maxResults']
 
+
             for issue in issues['issues']:
+                status_id = issue['fields']['status']["id"]
+                for column in columns:
+                    for each in column['statuses']:
+                        if each["id"] == status_id:
+                            column_name = column['name']
+                            break
+
                 issue['fields']['issuelinks'] += self._client.get("/issue/{}/remotelink".format(issue['key']))
                 assigned_to = users_bindings.get(issue['fields']['assignee']['key'] if issue['fields']['assignee'] else None, None)
                 owner = users_bindings.get(issue['fields']['creator']['key'] if issue['fields']['creator'] else None, self._user)
                 external_reference = None
                 if options.get('keep_external_reference', False):
                     external_reference = ["jira", self._client.get_issue_url(issue['key'])]
-
                 try:
                     milestone = project.milestones.get(name=(issue['fields'].get('sprint', {}) or {}).get('name', ''))
                 except Milestone.DoesNotExist:
                     milestone = None
-
                 us = UserStory.objects.create(
                     project=project,
                     owner=owner,
                     assigned_to=assigned_to,
-                    status=project.us_statuses.get(slug=slugify(issue['fields']['status']['statusCategory']['name'])),
+                    status=project.us_statuses.get(slug=slugify(column_name)),
                     kanban_order=counter,
                     sprint_order=counter,
                     backlog_order=counter,
