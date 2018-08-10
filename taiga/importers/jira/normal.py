@@ -30,7 +30,8 @@ from taiga.timeline.rebuilder import rebuild_timeline
 from taiga.timeline.models import Timeline
 from .common import JiraImporterCommon
 from taiga.importers import services as import_service
-
+import logging
+logger = logging.getLogger("jira importer")
 
 class JiraNormalImporter(JiraImporterCommon):
     def list_projects(self):
@@ -331,6 +332,7 @@ class JiraNormalImporter(JiraImporterCommon):
                     "fields": "*all",
                     "expand": "changelog,attachment",
                 })
+
                 offset += issues['maxResults']
 
                 for issue in issues['issues']:
@@ -433,6 +435,7 @@ class JiraNormalImporter(JiraImporterCommon):
 
     def _link_epics_with_user_stories(self, project_id, project, options):
         types = options.get('types_bindings', {}).get("us", [])
+        project_info = self._client.get("/project/{}".format(project_id))
         for issue_type in types:
             offset = 0
             while True:
@@ -445,13 +448,15 @@ class JiraNormalImporter(JiraImporterCommon):
                 for issue in issues['issues']:
                     epic_key = issue['fields'][self.greenhopper_fields['link']]
                     if epic_key:
-                        epic = project.epics.get(ref=int(epic_key.split("-")[1]))
-                        us = project.user_stories.get(ref=int(issue['key'].split("-")[1]))
-                        RelatedUserStory.objects.create(
-                            user_story=us,
-                            epic=epic,
-                            order=1
-                        )
+                        project_name = epic_key.split("-")[0]
+                        if (project_name == project_info["key"]):
+                            epic = project.epics.get(ref=int(epic_key.split("-")[1]))
+                            us = project.user_stories.get(ref=int(issue['key'].split("-")[1]))
+                            RelatedUserStory.objects.create(
+                                user_story=us,
+                                epic=epic,
+                                order=1
+                            )
 
                 if len(issues['issues']) < issues['maxResults']:
                     break
