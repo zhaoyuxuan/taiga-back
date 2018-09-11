@@ -161,6 +161,8 @@ class HistoryEntry(models.Model):
             return (key, value)
 
         def resolve_value(field, key):
+            if field not in self.values:
+               return None
             data = self.values[field]
             key = str(key)
 
