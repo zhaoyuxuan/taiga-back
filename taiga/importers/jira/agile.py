@@ -155,6 +155,7 @@ class JiraAgileImporter(JiraImporterCommon):
 
         if project_template.slug == "scrum":
             for sprint in self._client.get_agile("/board/{}/sprint".format(project_id))['values']:
+
                 start_datetime = sprint.get('startDate', None)
                 end_datetime = sprint.get('startDate', None)
                 start_date = datetime.date.today()
@@ -194,8 +195,6 @@ class JiraAgileImporter(JiraImporterCommon):
             })
 
             offset += issues['maxResults']
-
-
             for issue in issues['issues']:
                 status_id = issue['fields']['status']["id"]
                 for column in columns:
@@ -214,6 +213,13 @@ class JiraAgileImporter(JiraImporterCommon):
                     milestone = project.milestones.get(name=(issue['fields'].get('sprint', {}) or {}).get('name', ''))
                 except Milestone.DoesNotExist:
                     milestone = None
+                    if "closedSprints" in issue["fields"]:
+                        milestone = issue['fields']["closedSprints"][0]["name"].replace("'","")
+                        milestone = project.milestones.get(name=milestone)
+
+                    # logger.error(issue['fields']["closedSprints"])
+                    # logger.error("the milestone")
+                    # logger.error(milestone)
                 us = UserStory.objects.create(
                     project=project,
                     owner=owner,
