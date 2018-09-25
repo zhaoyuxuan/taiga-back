@@ -173,7 +173,8 @@ SITE_ID = "api"
 # Session configuration (only used for admin)
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 1209600 # (2 weeks)
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+CSRF_COOKIE_AGE = None
 # MAIL OPTIONS
 DEFAULT_FROM_EMAIL = "john@doe.com"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -266,7 +267,7 @@ MIDDLEWARE_CLASSES = [
     # Common middlewares
     "django.middleware.common.CommonMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Only needed by django admin
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -472,7 +473,8 @@ DEFAULT_PROJECT_TEMPLATE = "scrum"
 PUBLIC_REGISTER_ENABLED = False
 # None or [] values in USER_EMAIL_ALLOWED_DOMAINS means allow any domain
 USER_EMAIL_ALLOWED_DOMAINS = None
-
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 SEARCHES_MAX_RESULTS = 150
 
 SOUTH_MIGRATION_MODULES = {
