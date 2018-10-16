@@ -157,7 +157,7 @@ class JiraAgileImporter(JiraImporterCommon):
             for sprint in self._client.get_agile("/board/{}/sprint".format(project_id))['values']:
 
                 start_datetime = sprint.get('startDate', None)
-                end_datetime = sprint.get('startDate', None)
+                end_datetime = sprint.get('endDate', None)
                 start_date = datetime.date.today()
                 if start_datetime:
                     start_date = start_datetime[:10]
