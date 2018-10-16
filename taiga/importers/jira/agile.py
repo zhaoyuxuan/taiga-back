@@ -158,6 +158,7 @@ class JiraAgileImporter(JiraImporterCommon):
 
                 start_datetime = sprint.get('startDate', None)
                 end_datetime = sprint.get('endDate', None)
+                complete_date = sprint.get('completeDate',None)
                 start_date = datetime.date.today()
                 if start_datetime:
                     start_date = start_datetime[:10]
@@ -175,7 +176,7 @@ class JiraAgileImporter(JiraImporterCommon):
                 )
                 Milestone.objects.filter(id=milestone.id).update(
                     created_date=start_datetime or datetime.datetime.now(),
-                    modified_date=start_datetime or datetime.datetime.now(),
+                    modified_date=complete_date or datetime.datetime.now(),
                 )
         return project
 
