@@ -21,7 +21,7 @@ from django.conf import settings
 
 
 COORS_ALLOWED_ORIGINS = "*"
-COORS_ALLOWED_METHODS = ["POST", "GET", "OPTIONS","PATCH", "HEAD"]
+COORS_ALLOWED_METHODS = ["POST", "GET", "OPTIONS","HEAD"]
 COORS_ALLOWED_HEADERS = ["content-type", "x-requested-with",
                          "authorization", "accept-encoding",
                          "x-disable-pagination", "x-lazy-pagination",
