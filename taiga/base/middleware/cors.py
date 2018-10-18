@@ -21,7 +21,7 @@ from django.conf import settings
 
 
 COORS_ALLOWED_ORIGINS = "*"
-COORS_ALLOWED_METHODS = ["POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH", "HEAD"]
+COORS_ALLOWED_METHODS = ["POST", "GET", "OPTIONS","PATCH", "HEAD"]
 COORS_ALLOWED_HEADERS = ["content-type", "x-requested-with",
                          "authorization", "accept-encoding",
                          "x-disable-pagination", "x-lazy-pagination",
@@ -40,7 +40,7 @@ class CoorsMiddleware(object):
         response["Access-Control-Allow-Methods"] = ",".join(COORS_ALLOWED_METHODS)
         response["Access-Control-Allow-Headers"] = ",".join(COORS_ALLOWED_HEADERS)
         response["Access-Control-Expose-Headers"] = ",".join(COORS_EXPOSE_HEADERS + COORS_EXTRA_EXPOSE_HEADERS)
-        response["Access-Control-Max-Age"] = "3600"
+        response["Access-Control-Max-Age"] = "1800"
 
         if COORS_ALLOWED_CREDENTIALS:
             response["Access-Control-Allow-Credentials"] = "true"
