@@ -361,12 +361,11 @@ class JiraAgileImporter(JiraImporterCommon):
                 external_reference = None
                 if options.get('keep_external_reference', False):
                     external_reference = ["jira", self._client.get_issue_url(issue['key'])]
-
                 epic = Epic.objects.create(
                     project=project,
                     owner=owner,
                     assigned_to=assigned_to,
-                    status=project.epic_statuses.get(slug=slugify(issue['fields']['status']['name'])),
+                    status=project.epic_statuses.get(slug=slugify(issue['fields']['status']['statusCategory']['name'])),
                     subject=issue['fields']['summary'],
                     description=issue['fields']['description'] or '',
                     epics_order=counter,

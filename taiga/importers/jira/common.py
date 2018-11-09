@@ -242,16 +242,17 @@ class JiraImporterCommon:
         while True:
             comments = self._client.get("/issue/{}/comment".format(issue['key']), {"startAt": offset})
             for comment in comments['comments']:
-                snapshot = take_snapshot(
-                    obj,
-                    comment=comment['body'],
-                    user=users_bindings.get(
-                        comment['author']['name'],
-                        User(full_name=comment['author']['displayName'])
-                    ),
-                    delete=False
-                )
-                HistoryEntry.objects.filter(id=snapshot.id).update(created_at=comment['created'])
+                if "author" in comment:
+                    snapshot = take_snapshot(
+                        obj,
+                        comment=comment['body'],
+                        user=users_bindings.get(
+                            comment['author']['name'],
+                            User(full_name=comment['author']['displayName'])
+                        ),
+                        delete=False
+                    )
+                    HistoryEntry.objects.filter(id=snapshot.id).update(created_at=comment['created'])
 
             offset += len(comments['comments'])
             if len(comments['comments']) <= comments['maxResults']:
