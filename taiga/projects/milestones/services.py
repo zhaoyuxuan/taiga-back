@@ -19,13 +19,20 @@
 from django.utils import timezone
 
 from . import models
+import datetime
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 
 def calculate_milestone_is_closed(milestone):
-    return (milestone.user_stories.all().count() > 0 and
+    now = datetime.datetime.now().date()
+    sprint_end_date = milestone.estimated_finish
+
+    return (milestone.user_stories.all().count() >= 0 and
             all([task.status is not None and task.status.is_closed for task in milestone.tasks.all()]) and
-            all([user_story.is_closed for user_story in milestone.user_stories.all()]))
+            all([user_story.is_closed for user_story in milestone.user_stories.all()]) and (now >= sprint_end_date))
 
 
 def close_milestone(milestone):
