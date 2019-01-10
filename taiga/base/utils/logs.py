@@ -41,7 +41,7 @@ class CustomAdminEmailHandler(AdminEmailHandler):
 
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
 
-        error_message = reporter.get_traceback_text().strip().splitlines()[1]
+        error_message ="\n".join(reporter.get_traceback_text().strip().split("GET:")[0].splitlines()[-4:-1])
 
         message = "%s\n\n%s" % (self.format(no_exc_record), error_message)
         html_message = reporter.get_traceback_html() if self.include_html else None
