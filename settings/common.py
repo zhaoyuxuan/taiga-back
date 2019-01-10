@@ -378,7 +378,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers":["null","mail_admins"],
+            "handlers":["null"],
             "propagate": True,
             "level":"INFO",
         },
@@ -393,12 +393,12 @@ LOGGING = {
             "propagate": False,
         },
         "taiga": {
-            "handlers": ["console","mail_admins"],
+            "handlers": ["console"],
             "level": "DEBUG",
             "propagate": False,
         },
         "django.server": {
-            "handlers": ["django.server","mail_admins"],
+            "handlers": ["django.server"],
             "level": "INFO",
             "propagate": False,
         }
