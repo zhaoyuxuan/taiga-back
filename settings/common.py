@@ -368,7 +368,7 @@ LOGGING = {
         "mail_admins": {
             "level": "ERROR",
             "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler",
+            "class": "taiga.base.utils.logs.CustomAdminEmailHandler",
         },
         "django.server": {
             "level": "INFO",
@@ -378,7 +378,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers":["null"],
+            "handlers":["null","mail_admins"],
             "propagate": True,
             "level":"INFO",
         },
@@ -393,12 +393,12 @@ LOGGING = {
             "propagate": False,
         },
         "taiga": {
-            "handlers": ["console"],
+            "handlers": ["console","mail_admins"],
             "level": "DEBUG",
             "propagate": False,
         },
         "django.server": {
-            "handlers": ["django.server"],
+            "handlers": ["django.server","mail_admins"],
             "level": "INFO",
             "propagate": False,
         }
