@@ -18,8 +18,6 @@
 
 import datetime
 from collections import OrderedDict
-import logging
-logger = logging.getLogger("jira importer")
 
 from django.template.defaultfilters import slugify
 from taiga.projects.references.models import recalc_reference_counter
@@ -218,9 +216,6 @@ class JiraAgileImporter(JiraImporterCommon):
                         milestone = issue['fields']["closedSprints"][0]["name"].replace("'","")
                         milestone = project.milestones.get(name=milestone)
 
-                    # logger.error(issue['fields']["closedSprints"])
-                    # logger.error("the milestone")
-                    # logger.error(milestone)
                 us = UserStory.objects.create(
                     project=project,
                     owner=owner,
