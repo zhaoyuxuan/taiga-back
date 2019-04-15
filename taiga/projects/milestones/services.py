@@ -21,9 +21,6 @@ from django.utils import timezone
 from . import models
 import datetime
 
-import logging
-logger = logging.getLogger(__name__)
-
 
 
 def calculate_milestone_is_closed(milestone):
